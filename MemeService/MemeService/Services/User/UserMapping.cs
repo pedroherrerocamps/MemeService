@@ -19,7 +19,7 @@ namespace MemeService.Services.User
 
                 AccessCount = userModel.AccessCount,
                 Password = userModel.Password,
-                Premium = userDto.Premium
+                Premium = userModel.Premium
             };
         }
 
