@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MemeService.Services.Base
 {
-    public class BaseRepository<T> : IDisposable, IBaseRepository<T> where T : BaseModel
+    public class BaseRepository<T> : IBaseRepository<T> where T : BaseModel
     {
         private const string DATABASE = "MemeService";
         private readonly IMongoClient _mongoClient;
@@ -67,9 +67,5 @@ namespace MemeService.Services.Base
             return id;
         }
 
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
     }
 }

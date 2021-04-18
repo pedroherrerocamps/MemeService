@@ -37,7 +37,12 @@ namespace MemeService
             services.AddSingleton<IMemeDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<MemeDatabaseSettings>>().Value);
 
-            //services.AddSingleton<BaseRepository<BaseModel>>();
+            services.AddCors(o => o.AddPolicy("AllowCorsOriginFromEveryone", builder =>
+            {
+                builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+            }));
             services.AddSingleton<IMongoClient, MongoClient>(sp => new MongoClient(Configuration.GetSection("MemeDatabaseSettings").GetSection("ConnectionString").Value));
             services.AddControllers();
             services.AddSwaggerGen();
@@ -61,6 +66,7 @@ namespace MemeService
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors("AllowCorsOriginFromEveryone");
 
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>

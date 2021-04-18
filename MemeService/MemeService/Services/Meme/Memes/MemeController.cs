@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace MemeService.Services.Meme.Memes
 {
+    [EnableCors("AllowCorsOriginFromEveryone")]
     [Route("api/meme")]
     [ApiController]
     public class MemeController : ControllerBase
@@ -28,6 +29,13 @@ namespace MemeService.Services.Meme.Memes
         {
             return await _memeService.GetItems();
         }
+
+        [HttpGet, Route("{id}")]
+        public async Task<MemeDto> Get(string id)
+        {
+            return await _memeService.GetItem(ObjectId.Parse(id));
+        }
+
 
         [HttpPost, Route("byCondition")]
         public async Task<List<MemeDto>> GetByCondition([FromBody] MemeDto meme)
