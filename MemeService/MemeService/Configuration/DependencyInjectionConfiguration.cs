@@ -1,4 +1,5 @@
 ﻿using MemeService.Services.Meme.Memes;
+using MemeService.Services.Setting;
 using MemeService.Services.User;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -14,7 +15,8 @@ namespace MemeService.Configuration
         {
             services
                 .AddScoped<IMemeRepository, MemeRepository>()
-                .AddScoped<IUserRepository, UserRepository>();
+                .AddScoped<IUserRepository, UserRepository>()
+                .AddScoped<ISettingRepository, SettingRepository>();
 
             return services;
         }

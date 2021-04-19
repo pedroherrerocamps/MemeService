@@ -10,6 +10,7 @@ namespace MemeService.Services.Meme.Memes
     {
         public static MemeDto Map(this MemeModel memeModel)
         {
+            if (memeModel == null) return null;
             return new MemeDto()
             {
                 Id = memeModel.Id,
@@ -33,12 +34,13 @@ namespace MemeService.Services.Meme.Memes
 
         public static MemeModel Map(this MemeDto memeDto)
         {
+            if (memeDto == null) return null;
             return new MemeModel()
             {
                 Id = string.IsNullOrEmpty(memeDto.Id) ? ObjectId.GenerateNewId().ToString() : ObjectId.Parse(memeDto.Id) == ObjectId.Empty ? ObjectId.GenerateNewId().ToString() : memeDto.Id,
                 IsEnabled = memeDto.IsEnabled,
                 CreationDate = memeDto.CreationDate,
-                UpdateDate = memeDto.UpdateDate,
+                UpdateDate = DateTime.Now,
                 Name = memeDto.Name,
 
                 Description = memeDto.Description,
@@ -57,7 +59,8 @@ namespace MemeService.Services.Meme.Memes
         public static List<MemeModel> Map(this List<MemeDto> memes)
         {
             List<MemeModel> memeModelList = new List<MemeModel>();
-            foreach(MemeDto meme in memes)
+            if (memes == null || memes.Count == 0) return new List<MemeModel>();
+            foreach (MemeDto meme in memes)
             {
                 memeModelList.Add(meme.Map());
             }
@@ -67,6 +70,7 @@ namespace MemeService.Services.Meme.Memes
         public static List<MemeDto> Map(this List<MemeModel> memes)
         {
             List<MemeDto> memeDtoList = new List<MemeDto>();
+            if (memes == null || memes.Count == 0) return new List<MemeDto>();
             foreach (MemeModel meme in memes)
             {
                 memeDtoList.Add(meme.Map());

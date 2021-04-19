@@ -16,4 +16,10 @@ namespace MemeService.Services.Meme.Memes
         public string ShortUrl { get; set; }
         public long AccessCount { get; set; }
     }
+
+    public class MemeSearch
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+    }
 }

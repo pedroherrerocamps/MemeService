@@ -1,6 +1,7 @@
 ﻿using MemeService.Services.Base;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,8 @@ namespace MemeService.Services.Meme.Memes
 {
     public class MemeRepository: BaseRepository<MemeModel>, IMemeRepository
     {
-        public MemeRepository(IMongoClient mongoClient)
-        : base(mongoClient, "meme") { }
+        public MemeRepository(IMongoClient mongoClient, ILogger logger)
+        : base(mongoClient, "meme", logger) { }
 
         public async Task<List<MemeDto>> GetItems()
         {
@@ -20,7 +21,7 @@ namespace MemeService.Services.Meme.Memes
             return items.Map();
         }
 
-        public async Task<List<MemeDto>> GetItemsByCondition(MemeDto meme)
+        public async Task<List<MemeDto>> GetItemsByCondition(MemeSearch meme)
         {
             Expression<Func<MemeModel, bool>> expression;
             if (!string.IsNullOrEmpty(meme.Name))
@@ -28,29 +29,34 @@ namespace MemeService.Services.Meme.Memes
                 if (!string.IsNullOrEmpty(meme.Description))
                 {
                     expression = item => item.IsEnabled && item.Name.Equals(meme.Name) && item.Description.Contains(meme.Description);
-                    List<MemeModel> fullItems = await GetByCondition(expression);
+                    List<MemeModel> fullItems = await GetListByCondition(expression);
                     return fullItems.Map();
                 }
                 expression = item => item.IsEnabled && item.Name.Equals(meme.Name);
 
-                List<MemeModel> items = await GetByCondition(expression);
+                List<MemeModel> items = await GetListByCondition(expression);
                 return items.Map();
             }
             if (!string.IsNullOrEmpty(meme.Description))
             {
                 expression = item => item.IsEnabled && item.Description.Contains(meme.Description);
 
-                List<MemeModel> items = await GetByCondition(expression);
+                List<MemeModel> items = await GetListByCondition(expression);
                 return items.Map();
             }
             return null;
-
         }
 
-        public async Task<MemeDto> GetItem(ObjectId id)
+        public async Task<MemeDto> GetItem(string id)
         {
             MemeModel item = await Get(id);
 
+            return item.Map();
+        }
+
+        public async Task<MemeDto> GetItemByCondition(Expression<Func<MemeModel, bool>> expression)
+        {
+            MemeModel item = await GetByCondition(expression);
             return item.Map();
         }
 
@@ -61,8 +67,9 @@ namespace MemeService.Services.Meme.Memes
             return newItem.Map();
         }
 
-        public async Task<MemeDto> UpdateItem(ObjectId id, MemeDto item)
+        public async Task<MemeDto> UpdateItem(string id, MemeDto item)
         {
+            item.UpdateDate = DateTime.Now;
             MemeModel updatedItem = await Update(id, item.Map());
             return updatedItem.Map();
         }
@@ -73,9 +80,11 @@ namespace MemeService.Services.Meme.Memes
             return deletedItem.Map();
         }
 
-        public async Task<string> RemoveItem(string id)
+        public async Task<MemeDto> RemoveItem(string id)
         {
-            return await Remove(id);
+            MemeDto item = await GetItem(id);
+            await Remove(id);
+            return item;
         }
     }
 }
