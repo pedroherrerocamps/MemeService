@@ -42,21 +42,54 @@ namespace MemeService.Services.Base
 
         public async Task<T> Get(string id)
         {
-            return await _collection.Find<T>(item => item.Id.Equals(id)).FirstOrDefaultAsync();
+            T item = null;
+            try
+            {
+                item = await _collection.Find<T>(item => item.Id.Equals(id)).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Get error: " + ex.Message);
+            }
+            return item;
         }
 
         public async Task<List<T>> GetListByCondition(Expression<Func<T, bool>> expression)
         {
-            return await _collection.Find<T>(expression).ToListAsync();
+            List<T> items = null;
+            try
+            {
+                items = await _collection.Find<T>(expression).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("GetListByCondition error: " + ex.Message);
+            }
+            return items;
         }
         public async Task<T> GetByCondition(Expression<Func<T, bool>> expression)
         {
-            return await _collection.Find<T>(expression).FirstOrDefaultAsync();
+            T item = null;
+            try
+            {
+                item = await _collection.Find<T>(expression).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("GetByCondition error: " + ex.Message);
+            }
+            return item;
+
         }
 
         public async Task<T> Create(T item)
         {
-            _collection.InsertOne(item);
+            try { 
+                _collection.InsertOne(item);
+            }catch(Exception ex)
+            {
+                _logger.Error("Create error: " + ex.Message);
+            }
             return item;
         }
 
@@ -67,16 +100,23 @@ namespace MemeService.Services.Base
             try
             {
                 _collection.ReplaceOne(item => item.Id.Equals(id), newItem);
-            }catch(Exception ex)
+            } catch(Exception ex)
             {
-                string x;
+                _logger.Error("Update error: " + ex.Message);
             }
             return newItem;
         }
 
         public async Task<T> Remove(T deleteItem)
         {
-            _collection.DeleteOne(item => item.Id == deleteItem.Id);
+            try
+            {
+                _collection.DeleteOne(item => item.Id == deleteItem.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Delete error: " + ex.Message);
+            }
             return deleteItem;
         }
 
